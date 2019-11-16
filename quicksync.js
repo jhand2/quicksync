@@ -3,42 +3,55 @@ var client = require("scp2");
 var fs = require("fs");
 var read = require("read");
 
-// Dev machine files
-var HOME = "/home/jordan";
-var oe_dir = `${HOME}/code/openenclave`
-var ssh_key = `${HOME}/.ssh/id_rsa`;
+// Windows IP: 137.117.54.129
+// Windows OE dir: /C:/code/openenclave
 
-// Target
-var user = "jorhand"
-var ip = "137.117.54.129";
-var oe_target = '/C:/code/openenclave';
+var CONFIG = {
+    "client_oedir": "/home/jordan/code/openenclave",
+    "client_privkey": "/home/jordan/.ssh/id_rsa",
+    "target_username": "jorhand",
+    "target_ip": "13.68.192.102",
+    "target_oedir": "/home/jorhand/openenclave"
+}
 
-read(
-    { prompt: "SSH Passphrase: ", silent: true },
-    function(err, pass) {
-        set_file_watch(function(file) {
-            copy_file_to_target(file, user, pass);
-        })
-    }
-)
+
+function get_ssh_pass() {
+    return new Promise(function(resolve) {
+        read(
+            { prompt: "SSH Passphrase: ", silent: true },
+            function(err, pass) {
+                resolve(pass);
+            }
+        );
+    });
+}
 
 function copy_file_to_target(file, username, pass) {
-    var target_file = file.replace(oe_dir, oe_target);
+    var target_file = file.replace(CONFIG.client_oedir, CONFIG.target_oedir);
     console.log(`Copying ${file} to ${target_file}`);
     client.scp(file, {
-        host: ip,
+        host: CONFIG.target_ip,
         username: username,
         path: target_file,
-        privateKey: fs.readFileSync(ssh_key),
+        privateKey: fs.readFileSync(CONFIG.client_privkey),
         passphrase: pass
     }, function(err) {});
 }
 
 function set_file_watch(callback) {
-    gulp.watch([`${oe_dir}/**/*`,
-                `!${oe_dir}/3rdparty/**/*`,
-                `!${oe_dir}/build/**/*`,
-                `!${oe_dir}/.git/**/*`])
+    gulp.watch([`${CONFIG.client_oedir}/**/*`,
+                `!${CONFIG.client_oedir}/3rdparty/**/*`,
+                `!${CONFIG.client_oedir}/build/**/*`,
+                `!${CONFIG.client_oedir}/.git/**/*`])
         .on("change", callback);
 }
 
+function main() {
+    get_ssh_pass().then(function(pass) {
+        set_file_watch(function(file) {
+            copy_file_to_target(file, CONFIG.target_username, pass);
+        });
+    });
+}
+
+main();
