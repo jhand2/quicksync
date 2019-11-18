@@ -1,48 +1,17 @@
 package main
 
-import "fmt"
-import "time"
-import "github.com/radovskyb/watcher"
 
-
-func watch_files() {
-	w := watcher.New()
-	w.SetMaxEvents(1)
-	w.FilterOps(watcher.Rename, watcher.Move, watcher.Create, watcher.Remove)
-
-	// Set up listener
-	go func() {
-		for {
-			select {
-			case event := <-w.Event:	
-				fmt.Println(event) // Print the event's info.
-			case err := <-w.Error:
-				fmt.Println(err)
-				return
-			case <-w.Closed:
-				return
-			}
-		}
-	}()
-
-	// Watch current folder for changes.
-	if err := w.AddRecursive("."); err != nil {
-		fmt.Println(err)
-		return;
-	}
-
-	// Start listening
-	go func() {
-		w.Wait()
-	}()
-
-	// Start the watching process - it'll check for changes every 100ms.
-	if err := w.Start(time.Millisecond * 100); err != nil {
-		fmt.Println(err)
-		return;
-	}
+var CONFIG = map[string]string{
+    "client_oedir": "/home/jordan/code/openenclave",
+    "client_privkey": "/home/jordan/.ssh/id_rsa",
+    "target_username": "jorhand",
+    "target_ip": "13.68.192.102",
+    "target_oedir": "/home/jorhand/openenclave",
 }
 
 func main() {
-	watch_files()
+	fw := new(FileWatcher)
+	fw.Init()
+	fw.AddRecursive(".")
+	fw.Start()
 }
