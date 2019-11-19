@@ -2,18 +2,16 @@ var gulp = require("gulp");
 var client = require("scp2");
 var fs = require("fs");
 var read = require("read");
+var git = require("nodegit")
 
-// Windows IP: 137.117.54.129
-// Windows OE dir: /C:/code/openenclave
-
-var CONFIG = {
-    "client_oedir": "/home/jordan/code/openenclave",
-    "client_privkey": "/home/jordan/.ssh/id_rsa",
-    "target_username": "jorhand",
-    "target_ip": "13.68.192.102",
-    "target_oedir": "/home/jorhand/openenclave"
+var args = process.argv.slice(2)
+if (args.length < 1) {
+    console.log("Usage: node quicksync.js <config_name>");
+    process.exit(1);
 }
 
+var CONFIG = read_config(args[0]);
+console.log(CONFIG);
 
 function get_ssh_pass() {
     return new Promise(function(resolve) {
@@ -24,6 +22,11 @@ function get_ssh_pass() {
             }
         );
     });
+}
+
+function read_config(config_name) {
+    var f = fs.readFileSync("/home/jordan/.quicksync.conf");
+    return JSON.parse(f)[config_name];
 }
 
 function copy_file_to_target(file, username, pass) {
@@ -48,6 +51,17 @@ function set_file_watch(callback) {
 
 function main() {
     get_ssh_pass().then(function(pass) {
+        // Copy any files that are not currently checked into git
+        git.Repository.open(CONFIG.client_oedir).then(function(repo) {
+            return repo.getStatus();
+        }).then(function(results) {
+            for (let r of results) {
+                var f = CONFIG.client_oedir + "/" + r.path();
+                copy_file_to_target(f, CONFIG.target_username, pass);
+            }
+        });
+
+        // Watch for future file changes
         set_file_watch(function(file) {
             copy_file_to_target(file, CONFIG.target_username, pass);
         });

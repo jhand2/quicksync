@@ -1,11 +1,16 @@
 package main
 
-import "fmt"
-import "path/filepath"
-import "log"
-import "os"
-import "regexp"
-import "github.com/fsnotify/fsnotify"
+import (
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"regexp"
+
+	"github.com/fsnotify/fsnotify"
+)
+
+type WatchCallback func(e fsnotify.Event)
 
 type FileWatcher struct {
 	w *fsnotify.Watcher
@@ -23,14 +28,13 @@ func (f *FileWatcher) Add(path string) {
 	f.w.Add(path)
 }
 
-
 func (f *FileWatcher) AddRecursive(path string) {
 	addDir := func(path string, fi os.FileInfo, err error) error {
 		if fi.Mode().IsDir() {
 			f.w.Add(path)
 		}
 
-		return nil;
+		return nil
 	}
 
 	// starting at the root of the project, walk each file/directory searching for
@@ -40,26 +44,32 @@ func (f *FileWatcher) AddRecursive(path string) {
 	}
 }
 
-func (f *FileWatcher) isIgnored(path string) bool {
+func (f *FileWatcher) isIgnored(e fsnotify.Event) bool {
 	// TODO: Make ignore regex extensible
-	match, err := regexp.MatchString(`(\.swp)|(\.swx)|(~$)`, path)
+	match, err := regexp.MatchString(`(\.swp)|(\.swx)|(~$)`, e.Name)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return match
+	if match {
+		return true
+	}
+
+	// TODO: Make Event type filter configurable
+	if e.Op != fsnotify.Write {
+		return true
+	}
+
+	return false
 }
 
-func (f *FileWatcher) handleEvent(e fsnotify.Event) {
-	if !f.isIgnored(e.Name) {
-		if e.Op == fsnotify.Write {
-			log.Println("event:", e)
-			log.Println(e.Name)
-		}
+func (f *FileWatcher) handleEvent(e fsnotify.Event, callback WatchCallback) {
+	if !f.isIgnored(e) {
+		callback(e)
 	}
 }
 
-func (f *FileWatcher) Start() {
+func (f *FileWatcher) Start(callback WatchCallback) {
 	defer f.w.Close()
 
 	done := make(chan bool)
@@ -71,7 +81,7 @@ func (f *FileWatcher) Start() {
 					return
 				}
 
-				f.handleEvent(event)
+				f.handleEvent(event, callback)
 			case err, ok := <-f.w.Errors:
 				if !ok {
 					return
