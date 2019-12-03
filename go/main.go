@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -25,12 +27,27 @@ func read_config(config_name string) map[string]string {
 }
 
 func main() {
-	var config = read_config("linux_acc_vm")
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: quicksync <config_name>")
+		os.Exit(1)
+	}
+
+	var config = read_config(os.Args[1])
 
 	fw := new(FileWatcher)
 	fw.Init()
-	fw.AddRecursive(config["client_oedir"])
+	watch_dir := config["client_oedir"]
+	fmt.Printf("Watching directory %s\n", watch_dir)
+
+	scp := new(ScpCopier)
+	scp.Init(config["target_username"],
+		config["client_privkey"],
+		config["target_ip"]+":22")
+
+	fw.AddRecursive(watch_dir)
 	fw.Start(func(e fsnotify.Event) {
-		copy_file(e.Name, e.Name)
+		suffix := strings.TrimPrefix(e.Name, watch_dir)
+		fname := config["target_oedir"] + suffix
+		scp.copy_file(e.Name, fname)
 	})
 }
