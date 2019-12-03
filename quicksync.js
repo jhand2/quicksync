@@ -43,9 +43,14 @@ function copy_file_to_target(file, username, pass) {
 
 function set_file_watch(callback) {
     gulp.watch([`${CONFIG.client_oedir}/**/*`,
-                `!${CONFIG.client_oedir}/3rdparty/**/*`,
                 `!${CONFIG.client_oedir}/build/**/*`,
                 `!${CONFIG.client_oedir}/.git/**/*`])
+        .on('error', function (err) {
+            // swallow errors
+            //console.log(err.toString());
+
+            this.emit('end');
+        })
         .on("change", callback);
 }
 
