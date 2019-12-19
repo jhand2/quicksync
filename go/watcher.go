@@ -46,7 +46,7 @@ func (f *FileWatcher) AddRecursive(path string) {
 
 func (f *FileWatcher) isIgnored(e fsnotify.Event) bool {
 	// TODO: Make ignore regex extensible
-	match, err := regexp.MatchString(`(\.swp)|(\.swx)|(~$)`, e.Name)
+	match, err := regexp.MatchString(`(\.swp)|(\.swx)|(~$)|(/.git/)`, e.Name)
 	if err != nil {
 		log.Fatal(err)
 	}

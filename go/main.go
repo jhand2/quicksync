@@ -32,17 +32,24 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Get name of configuration from args and read it from user's config file
 	var config = read_config(os.Args[1])
 
 	fw := new(FileWatcher)
 	fw.Init()
 	watch_dir := config["client_oedir"]
-	fmt.Printf("Watching directory %s\n", watch_dir)
+
+	config_marshalled, err := json.MarshalIndent(config, "", " ")
+	if err == nil {
+		fmt.Println("Using config", string(config_marshalled))
+	}
 
 	scp := new(ScpCopier)
 	scp.Init(config["target_username"],
 		config["client_privkey"],
 		config["target_ip"]+":22")
+
+	fmt.Printf("Watching directory %s...\n", watch_dir)
 
 	fw.AddRecursive(watch_dir)
 	fw.Start(func(e fsnotify.Event) {

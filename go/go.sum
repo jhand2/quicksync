@@ -2,6 +2,10 @@ github.com/bramvdbogaerde/go-scp v0.0.0-20191005185035-c96fe084709e h1:HMQN3+cOQ
 github.com/bramvdbogaerde/go-scp v0.0.0-20191005185035-c96fe084709e/go.mod h1:aiQFnN5G0MivefWD+J4Em1a+CDyu/UBEmbNP5+8Gtd4=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
+github.com/jhand2/go-scp v0.0.0-20191005185035-c96fe084709e h1:BR9gnMan/41Yy1Vhtk6Z/QZFi6ZyqxvhvAUBGPU7T10=
+github.com/jhand2/go-scp v0.0.0-20191005185035-c96fe084709e/go.mod h1:GPZQMu19c7/FbYME/p+Lpkb6cVEvB5mXX/07HrLzAow=
+github.com/jhand2/go-scp v0.0.0-20191219010302-f7b78463868a h1:Y1toDmW5btU4IlWOknDpPnZ7/XLppA+NiWZhxSA1yvY=
+github.com/jhand2/go-scp v0.0.0-20191219010302-f7b78463868a/go.mod h1:GPZQMu19c7/FbYME/p+Lpkb6cVEvB5mXX/07HrLzAow=
 github.com/jhand2/watcher v1.0.8-0.20191117071650-05079743ee4b h1:PARs2g4mDqaoHGIncVV5GvO7fQnuide5wWmpwYQVstQ=
 github.com/jhand2/watcher v1.0.8-0.20191117071650-05079743ee4b/go.mod h1:zeP0wuhHhviLq9iRpaoNVt72CFY0YnEaBuPIsDv9+3M=
 github.com/radovskyb/watcher v1.0.7 h1:AYePLih6dpmS32vlHfhCeli8127LzkIgwJGcwwe8tUE=
@@ -9,6 +13,8 @@ github.com/radovskyb/watcher v1.0.7/go.mod h1:78okwvY5wPdzcb1UYnip1pvrZNIVEIh/Cm
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20191202143827-86a70503ff7e h1:egKlR8l7Nu9vHGWbcUV8lqR4987UfUbBd7GbhqGzNYU=
 golang.org/x/crypto v0.0.0-20191202143827-86a70503ff7e/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
+golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413 h1:ULYEB3JvPRE/IfO+9uO7vKV/xzVTO7XPAwm8xbf4w2g=
+golang.org/x/crypto v0.0.0-20191206172530-e9b2fee46413/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20190412213103-97732733099d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

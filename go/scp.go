@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"syscall"
 
-	scp "github.com/bramvdbogaerde/go-scp"
-	"github.com/bramvdbogaerde/go-scp/auth"
+	scp "github.com/jhand2/go-scp"
+	"github.com/jhand2/go-scp/auth"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 type ScpCopier struct {
@@ -17,16 +15,24 @@ type ScpCopier struct {
 }
 
 func (s *ScpCopier) Init(username string, privkey string, server string) {
-	// Get password for privkey
-	fmt.Print("Enter Password: ")
-	pw, err := terminal.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		log.Fatal("Could not read password. Error: ", err)
-	}
+	// TODO: Allow to use specific privkey path or ssh agent.
+	// Get password for privkey if ssh-agent fails
+	//fmt.Print("Enter Password: ")
+	//pw, err := terminal.ReadPassword(int(syscall.Stdin))
+	//if err != nil {
+	//log.Fatal("Could not read password. Error: ", err)
+	//}
 
-	conf, err := auth.PrivateKeyWithPassphrase(username, pw, privkey, ssh.InsecureIgnoreHostKey())
+	//fmt.Print("\n")
+
+	//conf, err := auth.PrivateKeyWithPassphrase(username, pw, privkey, ssh.InsecureIgnoreHostKey())
+	//if err != nil {
+	//log.Fatal("Could not use private key. Error: ", err)
+	//}
+
+	conf, err := auth.SshAgent(username, ssh.InsecureIgnoreHostKey())
 	if err != nil {
-		log.Fatal("Could not use private key. Error: ", err)
+		log.Fatal("Could not use ssh agent. Error: ", err)
 	}
 
 	s.client = scp.NewClient(server, &conf)
@@ -50,6 +56,6 @@ func (s *ScpCopier) copy_file(src string, dst string) {
 	// TODO: Change file permissions?
 	err = s.client.CopyFile(f, dst, "0655")
 	if err != nil {
-		log.Fatal("Could not copy file. Error: ", err)
+		log.Print("Could not copy file. Error: ", err)
 	}
 }
