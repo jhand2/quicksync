@@ -38,16 +38,16 @@ func (s *ScpCopier) Init(username string, privkey string, server string) {
 	s.client = scp.NewClient(server, &conf)
 }
 
-func (s *ScpCopier) copy_file(src string, dst string) {
+func (s *ScpCopier) copy_file(src string, dst string) error {
 	fmt.Printf("Copying %s to %s\n", src, dst)
 	err := s.client.Connect()
 	if err != nil {
-		log.Fatal("Could not open ssh connection. Error: ", err)
+		return err
 	}
 
 	f, err := os.Open(src)
 	if err != nil {
-		log.Fatal("Could not open file. Error: ", err)
+		return err
 	}
 
 	defer s.client.Close()
@@ -56,6 +56,8 @@ func (s *ScpCopier) copy_file(src string, dst string) {
 	// TODO: Change file permissions?
 	err = s.client.CopyFile(f, dst, "0655")
 	if err != nil {
-		log.Print("Could not copy file. Error: ", err)
+		return err
 	}
+
+	return nil
 }

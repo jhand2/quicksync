@@ -37,7 +37,7 @@ func main() {
 
 	fw := new(FileWatcher)
 	fw.Init()
-	watch_dir := config["client_oedir"]
+	watch_dir := config["client_dir"]
 
 	config_marshalled, err := json.MarshalIndent(config, "", " ")
 	if err == nil {
@@ -54,7 +54,9 @@ func main() {
 	fw.AddRecursive(watch_dir)
 	fw.Start(func(e fsnotify.Event) {
 		suffix := strings.TrimPrefix(e.Name, watch_dir)
-		fname := config["target_oedir"] + suffix
+		fname := config["target_dir"] + suffix
+
+		// Intentionally ignore errors in copying the file
 		scp.copy_file(e.Name, fname)
 	})
 }
