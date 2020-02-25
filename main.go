@@ -38,9 +38,12 @@ func make_target_path(config map[string]string, source_path string) string {
 	suffix := strings.TrimPrefix(source_path, client_dir)
 
 	var sep = ""
-	if !strings.HasSuffix(config["target_dir"], "/") &&
-		!strings.HasPrefix(suffix, "/") {
-		sep = "/"
+
+	// Only add a path separator if config["target_dir"] does not already end
+	// with one
+	if !strings.HasSuffix(config["target_dir"], string(os.PathSeparator)) &&
+		!strings.HasPrefix(suffix, string(os.PathSeparator)) {
+		sep = string(os.PathSeparator)
 	}
 
 	return config["target_dir"] + sep + suffix
@@ -73,9 +76,12 @@ func main() {
 
 	fmt.Println()
 	for _, m := range matches {
-		fname := make_target_path(config, m)
-		// Intentionally ignore errors in copying the file
-		scp.copy_file(m, fname)
+		src_name := config["client_dir"] + string(os.PathSeparator) + m
+		target_name := make_target_path(config, m)
+		err = scp.copy_file(src_name, target_name)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 	fmt.Println()
 
